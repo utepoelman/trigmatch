@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="en-NZ" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TrigMatch - NZ Maths Exact Values Activity</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts: Inter & Noto Serif for Math -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Serif:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            serif: ['Noto Serif', 'serif'],
+          },
+          colors: {
+            pounamu: {
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              400: '#4ade80',
+              500: '#22c55e',
+              600: '#16a34a',
+              800: '#166534',
+              900: '#14532d',
+              950: '#052e16',
+            },
+            pacific: {
+              50: '#f0f9ff',
+              400: '#38bdf8',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              900: '#0c4a6e',
+              950: '#082f49',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* 3D Card Flip CSS */
+    .perspective-1000 {
+      perspective: 1000px;
+    }
+    .transform-style-3d {
+      transform-style: preserve-3d;
+    }
+    .backface-hidden {
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+    .rotate-y-180 {
+      transform: rotateY(180deg);
+    }
+
+    /* Wrong Match Shake Animation */
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-6px); }
+      40%, 80% { transform: translateX(6px); }
+    }
+    .animate-shake {
+      animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+    }
+
+    /* Custom Typesetting for Maths Fractions & Roots */
+    .math-frac {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      vertical-align: middle;
+      line-height: 1;
+      padding: 0 2px;
+    }
+    .math-num {
+      border-bottom: 1.5px solid currentColor;
+      padding-bottom: 2px;
+      padding-left: 2px;
+      padding-right: 2px;
+    }
+    .math-den {
+      padding-top: 2px;
+      padding-left: 2px;
+      padding-right: 2px;
+    }
+    .math-sqrt {
+      display: inline-flex;
+      align-items: center;
+      line-height: 1;
+    }
+    .math-sqrt-symbol {
+      font-family: system-ui, sans-serif;
+      font-size: 0.85em;
+      margin-right: 1px;
+    }
+    .math-sqrt-radicand {
+      border-top: 1.5px solid currentColor;
+      padding-top: 1px;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #090d16;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1e293b;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #334155;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans selection:bg-teal-500 selection:text-slate-950">
+
+  <!-- Main Container -->
+  <div class="flex-grow flex flex-col max-w-7xl w-full mx-auto px-3 sm:px-6 py-4 sm:py-6">
+    
+    <!-- Top Header & Branding -->
+    <header class="flex flex-col sm:flex-row items-center justify-between gap-4 pb-4 border-b border-slate-800/80">
+      <div class="flex items-center gap-3">
+        <!-- NZ Silver Fern & Theta Icon Badge -->
+        <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-emerald-400 via-teal-600 to-cyan-700 flex items-center justify-center shadow-lg shadow-teal-500/20 text-slate-950 font-serif text-2xl font-bold ring-1 ring-emerald-300/30">
+          θ
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-xl sm:text-2xl font-bold bg-gradient-to-r from-emerald-300 via-teal-200 to-cyan-400 bg-clip-text text-transparent">
+              TrigMatch NZ
+            </h1>
+            <span class="text-[10px] font-semibold uppercase tracking-widest px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-800/60">
+              NCEA Maths
+            </span>
+          </div>
+          <p class="text-xs text-slate-400">Practise exact values of trigonometric functions</p>
+        </div>
+      </div>
+
+      <!-- Quick Controls & Help Buttons -->
+      <div class="flex items-center gap-2">
+        <button id="soundToggleBtn" onclick="toggleSound()" class="p-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white transition-all text-sm flex items-center gap-2 shadow-sm" title="Toggle Sound FX">
+          <span id="soundIcon">🔊</span>
+          <span class="hidden md:inline text-xs font-medium">Sound</span>
+        </button>
+        <button onclick="openModal('refModal')" class="px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-teal-400 hover:text-teal-300 transition-all text-sm flex items-center gap-2 shadow-sm">
+          <span>📖</span>
+          <span class="text-xs font-medium">Reference Chart</span>
+        </button>
+        <button onclick="openModal('helpModal')" class="px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white transition-all text-sm flex items-center gap-2 shadow-sm">
+          <span>❓</span>
+          <span class="text-xs font-medium">Instructions</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Game Setup & Options Panel -->
+    <section class="mt-4 p-4 rounded-2xl bg-slate-900/80 border border-slate-800 backdrop-blur-md shadow-xl">
+      <div class="flex items-center justify-between mb-3 border-b border-slate-800/60 pb-2">
+        <h2 class="text-xs font-bold uppercase tracking-wider text-teal-400 flex items-center gap-1.5">
+          <span>⚙️</span> Game Setup & Options
+        </h2>
+        <span class="text-[11px] text-slate-500">Select options then start a new game</span>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-center">
+        
+        <!-- Option 1: Angle Units -->
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-semibold text-slate-400">Angle Units</label>
+          <div class="inline-flex p-1 bg-slate-950 rounded-xl border border-slate-800">
+            <button onclick="setAngleUnit('degrees')" id="unit-deg" class="flex-1 py-1.5 text-xs font-medium rounded-lg transition-all text-slate-400">Degrees (°)</button>
+            <button onclick="setAngleUnit('radians')" id="unit-rad" class="flex-1 py-1.5 text-xs font-medium rounded-lg transition-all text-slate-400">Radians (rad)</button>
+          </div>
+        </div>
+
+        <!-- Option 2: Reciprocal Functions -->
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-semibold text-slate-400">Trig Functions</label>
+          <button onclick="toggleReciprocals()" id="reciprocalToggleBtn" class="flex items-center justify-between px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs font-medium text-slate-300 hover:border-slate-700 transition-all">
+            <span id="recipLabel">Primary (sin, cos, tan)</span>
+            <div id="recipSwitch" class="w-8 h-4 bg-slate-800 rounded-full relative transition-colors">
+              <div id="recipDot" class="w-3 h-3 bg-slate-400 rounded-full absolute top-0.5 left-0.5 transition-transform"></div>
+            </div>
+          </button>
+        </div>
+
+        <!-- Option 3: Game Play Mode -->
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-semibold text-slate-400">Game Play Mode</label>
+          <div class="inline-flex p-1 bg-slate-950 rounded-xl border border-slate-800">
+            <button onclick="setGameMode('memory')" id="mode-mem" class="flex-1 py-1.5 text-xs font-medium rounded-lg transition-all text-slate-400 flex items-center justify-center gap-1">
+              <span>🧠</span> Memory
+            </button>
+            <button onclick="setGameMode('faceup')" id="mode-face" class="flex-1 py-1.5 text-xs font-medium rounded-lg transition-all text-slate-400 flex items-center justify-center gap-1">
+              <span>👁️</span> Face-Up
+            </button>
+          </div>
+        </div>
+
+        <!-- Action: Start / Restart Button -->
+        <div class="flex flex-col justify-end">
+          <button onclick="startNewGame()" class="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-600 to-cyan-600 hover:from-emerald-400 hover:to-cyan-500 text-slate-950 font-bold text-xs uppercase tracking-wider shadow-lg shadow-teal-500/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+            <span>⚡</span>
+            <span>Start New Game (9 Pairs)</span>
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Stats Dashboard Bar -->
+    <section class="mt-4 px-4 py-3 rounded-xl bg-slate-900/60 border border-slate-800/80 flex flex-wrap items-center justify-between gap-3 text-xs sm:text-sm font-mono">
+      <div class="flex items-center gap-2 text-teal-400">
+        <span class="text-slate-400 font-sans">⏱️ Time Elapsed:</span>
+        <span id="statTimer" class="font-bold text-base text-teal-300">00:00</span>
+      </div>
+      <div class="flex items-center gap-2 text-emerald-400">
+        <span class="text-slate-400 font-sans">🎯 Pairs Matched:</span>
+        <span id="statMatches" class="font-bold text-base text-emerald-300">0 / 9</span>
+      </div>
+      <div class="flex items-center gap-2 text-cyan-400">
+        <span class="text-slate-400 font-sans">🔄 Attempts Made:</span>
+        <span id="statAttempts" class="font-bold text-base text-cyan-300">0</span>
+      </div>
+      <div class="flex items-center gap-2 text-purple-400">
+        <span class="text-slate-400 font-sans">📊 Accuracy:</span>
+        <span id="statAccuracy" class="font-bold text-base text-purple-300">100%</span>
+      </div>
+    </section>
+
+    <!-- Cards Grid Board (18 Cards = 9 Pairs) -->
+    <main class="mt-4 flex-grow flex items-center justify-center">
+      <div id="cardGrid" class="w-full grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2.5 sm:gap-4 my-auto">
+        <!-- Dynamically rendered via JS -->
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-6 pt-3 border-t border-slate-800 text-center text-xs text-slate-500 flex flex-col sm:flex-row justify-between items-center gap-2">
+      <span>TrigMatch NZ • Designed for High School & NCEA Level 2/3 Maths Practise</span>
+      <span class="text-slate-600">🌿 Ka Pai for learning Maths!</span>
+    </footer>
+
+  </div>
+
+  <!-- MODAL 1: Victory Celebration Screen -->
+  <div id="victoryModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+    <div class="w-full max-w-md rounded-2xl bg-slate-900 border border-slate-700 p-6 shadow-2xl text-center relative overflow-hidden">
+      <!-- Decorative Glow -->
+      <div class="absolute -top-12 -left-12 w-32 h-32 bg-emerald-500/20 rounded-full blur-2xl"></div>
+      <div class="absolute -bottom-12 -right-12 w-32 h-32 bg-teal-500/20 rounded-full blur-2xl"></div>
+
+      <div class="text-5xl mb-2 animate-bounce">🇳🇿 🏆</div>
+      <h2 class="text-2xl font-bold bg-gradient-to-r from-emerald-300 via-teal-200 to-cyan-400 bg-clip-text text-transparent">
+        Ka Pai! Round Complete!
+      </h2>
+      <p id="victorySubtitle" class="text-xs text-slate-400 mt-1">Excellent work matching trig exact values!</p>
+
+      <!-- Star Rating -->
+      <div id="starContainer" class="flex justify-center gap-2 my-4 text-3xl">
+        <span>⭐</span><span>⭐</span><span>⭐</span>
+      </div>
+
+      <!-- Final Stats Summary Table -->
+      <div class="grid grid-cols-3 gap-2 bg-slate-950/70 rounded-xl p-3 my-4 border border-slate-800 text-xs font-mono">
+        <div>
+          <div class="text-slate-500">Total Time</div>
+          <div id="finalTime" class="font-bold text-teal-400 text-sm mt-0.5">00:00</div>
+        </div>
+        <div>
+          <div class="text-slate-500">Attempts</div>
+          <div id="finalAttempts" class="font-bold text-cyan-400 text-sm mt-0.5">0</div>
+        </div>
+        <div>
+          <div class="text-slate-500">Accuracy</div>
+          <div id="finalAccuracy" class="font-bold text-emerald-400 text-sm mt-0.5">100%</div>
+        </div>
+      </div>
+
+      <p id="victoryFeedback" class="text-xs text-slate-300 italic mb-6">
+        Top effort! You recognised all exact values with fantastic precision.
+      </p>
+
+      <div class="flex gap-3">
+        <button onclick="closeModal('victoryModal'); startNewGame();" class="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-bold text-xs uppercase tracking-wider shadow-lg shadow-emerald-500/20 transition-all">
+          Play Next Game ⚡
+        </button>
+        <button onclick="closeModal('victoryModal'); openModal('refModal');" class="py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium transition-all">
+          Review Values 📖
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: Trigonometric Exact Values Reference Table -->
+  <div id="refModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md">
+    <div class="w-full max-w-4xl max-h-[90vh] rounded-2xl bg-slate-900 border border-slate-700 p-4 sm:p-6 shadow-2xl flex flex-col relative">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">📖</span>
+          <h3 class="font-bold text-lg text-slate-100">Exact Values Reference Chart</h3>
+        </div>
+        <button onclick="closeModal('refModal')" class="text-slate-400 hover:text-white text-xl p-1">✕</button>
+      </div>
+
+      <div class="overflow-x-auto overflow-y-auto flex-grow my-4 rounded-xl border border-slate-800 bg-slate-950/60 p-2">
+        <table class="w-full text-xs sm:text-sm text-center border-collapse font-serif">
+          <thead>
+            <tr class="border-b border-slate-800 text-slate-400 font-sans">
+              <th class="p-2 border-r border-slate-800">Degrees</th>
+              <th class="p-2 border-r border-slate-800">Radians</th>
+              <th class="p-2 border-r border-slate-800 text-teal-400">sin θ</th>
+              <th class="p-2 border-r border-slate-800 text-teal-400">cos θ</th>
+              <th class="p-2 border-r border-slate-800 text-teal-400">tan θ</th>
+              <th class="p-2 border-r border-slate-800 text-purple-400">csc θ</th>
+              <th class="p-2 border-r border-slate-800 text-purple-400">sec θ</th>
+              <th class="p-2 text-purple-400">cot θ</th>
+            </tr>
+          </thead>
+          <tbody id="refTableBody" class="divide-y divide-slate-800/60 text-slate-200">
+            <!-- Populated via JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="flex justify-between items-center text-xs text-slate-400 pt-2 border-t border-slate-800">
+        <span>Note: Reciprocal relationships are csc θ = 1/sin θ, sec θ = 1/cos θ, cot θ = 1/tan θ.</span>
+        <button onclick="closeModal('refModal')" class="px-4 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-sans">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 3: Instructions -->
+  <div id="helpModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+    <div class="w-full max-w-md rounded-2xl bg-slate-900 border border-slate-700 p-6 shadow-2xl relative">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">❓</span>
+          <h3 class="font-bold text-lg text-slate-100">How to Play</h3>
+        </div>
+        <button onclick="closeModal('helpModal')" class="text-slate-400 hover:text-white text-xl p-1">✕</button>
+      </div>
+
+      <div class="space-y-4 my-4 text-xs sm:text-sm text-slate-300 leading-relaxed">
+        <div class="flex gap-3">
+          <div class="w-7 h-7 rounded-lg bg-teal-950 border border-teal-800 text-teal-400 font-bold flex items-center justify-center shrink-0">1</div>
+          <div>
+            <strong class="text-slate-100">Objective:</strong> Match all 9 trigonometric expressions with their correct exact mathematical value cards (18 cards total).
+          </div>
+        </div>
+
+        <div class="flex gap-3">
+          <div class="w-7 h-7 rounded-lg bg-emerald-950 border border-emerald-800 text-emerald-400 font-bold flex items-center justify-center shrink-0">2</div>
+          <div>
+            <strong class="text-slate-100">Memory Mode:</strong> Cards are face down. Flip over two cards to check if the expression matches its exact value!
+          </div>
+        </div>
+
+        <div class="flex gap-3">
+          <div class="w-7 h-7 rounded-lg bg-cyan-950 border border-cyan-800 text-cyan-400 font-bold flex items-center justify-center shrink-0">3</div>
+          <div>
+            <strong class="text-slate-100">Face-Up Mode:</strong> All cards are face up. Select a function card and click its corresponding exact value card.
+          </div>
+        </div>
+
+        <div class="flex gap-3">
+          <div class="w-7 h-7 rounded-lg bg-purple-950 border border-purple-800 text-purple-400 font-bold flex items-center justify-center shrink-0">4</div>
+          <div>
+            <strong class="text-slate-100">Customise Options:</strong> Switch between Degrees (°), Radians (rad), and toggle reciprocal functions (cosecant, secant, cotangent).
+          </div>
+        </div>
+      </div>
+
+      <div class="pt-2 border-t border-slate-800 text-right">
+        <button onclick="closeModal('helpModal')" class="px-4 py-2 rounded-xl bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold text-xs transition-all">Got it!</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    /* Math Formatting Helpers */
+    function makeSqrt(val) {
+      return `<span class="math-sqrt"><span class="math-sqrt-symbol">√</span><span class="math-sqrt-radicand">${val}</span></span>`;
+    }
+
+    function makeFrac(num, den) {
+      return `<div class="math-frac"><span class="math-num">${num}</span><span class="math-den">${den}</span></div>`;
+    }
+
+    function makeRad(num, den) {
+      if (!den) return num;
+      return `<div class="math-frac"><span class="math-num">${num}</span><span class="math-den">${den}</span></div>`;
+    }
+
+    /* Trigonometric Exact Values Database */
+    const TRIG_DATA = [
+      // 0° / 0 rad
+      { angleDeg: '0°', radNum: '0', radDen: '', fn: 'sin', valKey: '0', valHtml: '0' },
+      { angleDeg: '0°', radNum: '0', radDen: '', fn: 'cos', valKey: '1', valHtml: '1' },
+      { angleDeg: '0°', radNum: '0', radDen: '', fn: 'tan', valKey: '0', valHtml: '0' },
+      { angleDeg: '0°', radNum: '0', radDen: '', fn: 'sec', valKey: '1', valHtml: '1' },
+
+      // 30° / π/6 rad
+      { angleDeg: '30°', radNum: 'π', radDen: '6', fn: 'sin', valKey: '1/2', valHtml: makeFrac('1', '2') },
+      { angleDeg: '30°', radNum: 'π', radDen: '6', fn: 'cos', valKey: 'sqrt3/2', valHtml: makeFrac(makeSqrt('3'), '2') },
+      { angleDeg: '30°', radNum: 'π', radDen: '6', fn: 'tan', valKey: 'sqrt3/3', valHtml: makeFrac(makeSqrt('3'), '3') },
+      { angleDeg: '30°', radNum: 'π', radDen: '6', fn: 'csc', valKey: '2', valHtml: '2' },
+      { angleDeg: '30°', radNum: 'π', radDen: '6', fn: 'sec', valKey: '2sqrt3/3', valHtml: makeFrac('2' + makeSqrt('3'), '3') },
+      { angleDeg: '30°', radNum: 'π', radDen: '6', fn: 'cot', valKey: 'sqrt3', valHtml: makeSqrt('3') },
+
+      // 45° / π/4 rad
+      { angleDeg: '45°', radNum: 'π', radDen: '4', fn: 'sin', valKey: 'sqrt2/2', valHtml: makeFrac(makeSqrt('2'), '2') },
+      { angleDeg: '45°', radNum: 'π', radDen: '4', fn: 'cos', valKey: 'sqrt2/2', valHtml: makeFrac(makeSqrt('2'), '2') },
+      { angleDeg: '45°', radNum: 'π', radDen: '4', fn: 'tan', valKey: '1', valHtml: '1' },
+      { angleDeg: '45°', radNum: 'π', radDen: '4', fn: 'csc', valKey: 'sqrt2', valHtml: makeSqrt('2') },
+      { angleDeg: '45°', radNum: 'π', radDen: '4', fn: 'sec', valKey: 'sqrt2', valHtml: makeSqrt('2') },
+      { angleDeg: '45°', radNum: 'π', radDen: '4', fn: 'cot', valKey: '1', valHtml: '1' },
+
+      // 60° / π/3 rad
+      { angleDeg: '60°', radNum: 'π', radDen: '3', fn: 'sin', valKey: 'sqrt3/2', valHtml: makeFrac(makeSqrt('3'), '2') },
+      { angleDeg: '60°', radNum: 'π', radDen: '3', fn: 'cos', valKey: '1/2', valHtml: makeFrac('1', '2') },
+      { angleDeg: '60°', radNum: 'π', radDen: '3', fn: 'tan', valKey: 'sqrt3', valHtml: makeSqrt('3') },
+      { angleDeg: '60°', radNum: 'π', radDen: '3', fn: 'csc', valKey: '2sqrt3/3', valHtml: makeFrac('2' + makeSqrt('3'), '3') },
+      { angleDeg: '60°', radNum: 'π', radDen: '3', fn: 'sec', valKey: '2', valHtml: '2' },
+      { angleDeg: '60°', radNum: 'π', radDen: '3', fn: 'cot', valKey: 'sqrt3/3', valHtml: makeFrac(makeSqrt('3'), '3') },
+
+      // 90° / π/2 rad
+      { angleDeg: '90°', radNum: 'π', radDen: '2', fn: 'sin', valKey: '1', valHtml: '1' },
+      { angleDeg: '90°', radNum: 'π', radDen: '2', fn: 'cos', valKey: '0', valHtml: '0' },
+      { angleDeg: '90°', radNum: 'π', radDen: '2', fn: 'csc', valKey: '1', valHtml: '1' },
+      { angleDeg: '90°', radNum: 'π', radDen: '2', fn: 'cot', valKey: '0', valHtml: '0' },
+
+      // 120° / 2π/3 rad
+      { angleDeg: '120°', radNum: '2π', radDen: '3', fn: 'sin', valKey: 'sqrt3/2', valHtml: makeFrac(makeSqrt('3'), '2') },
+      { angleDeg: '120°', radNum: '2π', radDen: '3', fn: 'cos', valKey: '-1/2', valHtml: '-' + makeFrac('1', '2') },
+      { angleDeg: '120°', radNum: '2π', radDen: '3', fn: 'tan', valKey: '-sqrt3', valHtml: '-' + makeSqrt('3') },
+      { angleDeg: '120°', radNum: '2π', radDen: '3', fn: 'csc', valKey: '2sqrt3/3', valHtml: makeFrac('2' + makeSqrt('3'), '3') },
+      { angleDeg: '120°', radNum: '2π', radDen: '3', fn: 'sec', valKey: '-2', valHtml: '-2' },
+      { angleDeg: '120°', radNum: '2π', radDen: '3', fn: 'cot', valKey: '-sqrt3/3', valHtml: '-' + makeFrac(makeSqrt('3'), '3') },
+
+      // 135° / 3π/4 rad
+      { angleDeg: '135°', radNum: '3π', radDen: '4', fn: 'sin', valKey: 'sqrt2/2', valHtml: makeFrac(makeSqrt('2'), '2') },
+      { angleDeg: '135°', radNum: '3π', radDen: '4', fn: 'cos', valKey: '-sqrt2/2', valHtml: '-' + makeFrac(makeSqrt('2'), '2') },
+      { angleDeg: '135°', radNum: '3π', radDen: '4', fn: 'tan', valKey: '-1', valHtml: '-1' },
+      { angleDeg: '135°', radNum: '3π', radDen: '4', fn: 'csc', valKey: 'sqrt2', valHtml: makeSqrt('2') },
+      { angleDeg: '135°', radNum: '3π', radDen: '4', fn: 'sec', valKey: '-sqrt2', valHtml: '-' + makeSqrt('2') },
+      { angleDeg: '135°', radNum: '3π', radDen: '4', fn: 'cot', valKey: '-1', valHtml: '-1' },
+
+      // 150° / 5π/6 rad
+      { angleDeg: '150°', radNum: '5π', radDen: '6', fn: 'sin', valKey: '1/2', valHtml: makeFrac('1', '2') },
+      { angleDeg: '150°', radNum: '5π', radDen: '6', fn: 'cos', valKey: '-sqrt3/2', valHtml: '-' + makeFrac(makeSqrt('3'), '2') },
+      { angleDeg: '150°', radNum: '5π', radDen: '6', fn: 'tan', valKey: '-sqrt3/3', valHtml: '-' + makeFrac(makeSqrt('3'), '3') },
+      { angleDeg: '150°', radNum: '5π', radDen: '6', fn: 'csc', valKey: '2', valHtml: '2' },
+      { angleDeg: '150°', radNum: '5π', radDen: '6', fn: 'sec', valKey: '-2sqrt3/3', valHtml: '-' + makeFrac('2' + makeSqrt('3'), '3') },
+      { angleDeg: '150°', radNum: '5π', radDen: '6', fn: 'cot', valKey: '-sqrt3', valHtml: '-' + makeSqrt('3') },
+
+      // 180° / π rad
+      { angleDeg: '180°', radNum: 'π', radDen: '', fn: 'sin', valKey: '0', valHtml: '0' },
+      { angleDeg: '180°', radNum: 'π', radDen: '', fn: 'cos', valKey: '-1', valHtml: '-1' },
+      { angleDeg: '180°', radNum: 'π', radDen: '', fn: 'tan', valKey: '0', valHtml: '0' },
+      { angleDeg: '180°', radNum: 'π', radDen: '', fn: 'sec', valKey: '-1', valHtml: '-1' },
+
+      // 210° / 7π/6 rad
+      { angleDeg: '210°', radNum: '7π', radDen: '6', fn: 'sin', valKey: '-1/2', valHtml: '-' + makeFrac('1', '2') },
+      { angleDeg: '210°', radNum: '7π', radDen: '6', fn: 'cos', valKey: '-sqrt3/2', valHtml: '-' + makeFrac(makeSqrt('3'), '2') },
+      { angleDeg: '210°', radNum: '7π', radDen: '6', fn: 'tan', valKey: 'sqrt3/3', valHtml: makeFrac(makeSqrt('3'), '3') },
+      { angleDeg: '210°', radNum: '7π', radDen: '6', fn: 'csc', valKey: '-2', valHtml: '-2' },
+      { angleDeg: '210°', radNum: '7π', radDen: '6', fn: 'sec', valKey: '-2sqrt3/3', valHtml: '-' + makeFrac('2' + makeSqrt('3'), '3') },
+      { angleDeg: '210°', radNum: '7π', radDen: '6', fn: 'cot', valKey: 'sqrt3', valHtml: makeSqrt('3') },
+
+      // 225° / 5π/4 rad
+      { angleDeg: '225°', radNum: '5π', radDen: '4', fn: 'sin', valKey: '-sqrt2/2', valHtml: '-' + makeFrac(makeSqrt('2'), '2') },
+      { angleDeg: '225°', radNum: '5π', radDen: '4', fn: 'cos', valKey: '-sqrt2/2', valHtml: '-' + makeFrac(makeSqrt('2'), '2') },
+      { angleDeg: '225°', radNum: '5π', radDen: '4', fn: 'tan', valKey: '1', valHtml: '1' },
+      { angleDeg: '225°', radNum: '5π', radDen: '4', fn: 'csc', valKey: '-sqrt2', valHtml: '-' + makeSqrt('2') },
+      { angleDeg: '225°', radNum: '5π', radDen: '4', fn: 'sec', valKey: '-sqrt2', valHtml: '-' + makeSqrt('2') },
+      { angleDeg: '225°', radNum: '5π', radDen: '4', fn: 'cot', valKey: '1', valHtml: '1' },
+
+      // 240° / 4π/3 rad
+      { angleDeg: '240°', radNum: '4π', radDen: '3', fn: 'sin', valKey: '-sqrt3/2', valHtml: '-' + makeFrac(makeSqrt('3'), '2') },
+      { angleDeg: '240°', radNum: '4π', radDen: '3', fn: 'cos', valKey: '-1/2', valHtml: '-' + makeFrac('1', '2') },
+      { angleDeg: '240°', radNum: '4π', radDen: '3', fn: 'tan', valKey: 'sqrt3', valHtml: makeSqrt('3') },
+      { angleDeg: '240°', radNum: '4π', radDen: '3', fn: 'csc', valKey: '-2sqrt3/3', valHtml: '-' + makeFrac('2' + makeSqrt('3'), '3') },
+      { angleDeg: '240°', radNum: '4π', radDen: '3', fn: 'sec', valKey: '-2', valHtml: '-2' },
+      { angleDeg: '240°', radNum: '4π', radDen: '3', fn: 'cot', valKey: 'sqrt3/3', valHtml: makeFrac(makeSqrt('3'), '3') },
+
+      // 270° / 3π/2 rad
+      { angleDeg: '270°', radNum: '3π', radDen: '2', fn: 'sin', valKey: '-1', valHtml: '-1' },
+      { angleDeg: '270°', radNum: '3π', radDen: '2', fn: 'cos', valKey: '0', valHtml: '0' },
+      { angleDeg: '270°', radNum: '3π', radDen: '2', fn: 'csc', valKey: '-1', valHtml: '-1' },
+      { angleDeg: '270°', radNum: '3π', radDen: '2', fn: 'cot', valKey: '0', valHtml: '0' },
+
+      // 300° / 5π/3 rad
+      { angleDeg: '300°', radNum: '5π', radDen: '3', fn: 'sin', valKey: '-sqrt3/2', valHtml: '-' + makeFrac(makeSqrt('3'), '2') },
+      { angleDeg: '300°', radNum: '5π', radDen: '3', fn: 'cos', valKey: '1/2', valHtml: makeFrac('1', '2') },
+      { angleDeg: '300°', radNum: '5π', radDen: '3', fn: 'tan', valKey: '-sqrt3', valHtml: '-' + makeSqrt('3') },
+      { angleDeg: '300°', radNum: '5π', radDen: '3', fn: 'csc', valKey: '-2sqrt3/3', valHtml: '-' + makeFrac('2' + makeSqrt('3'), '3') },
+      { angleDeg: '300°', radNum: '5π', radDen: '3', fn: 'sec', valKey: '2', valHtml: '2' },
+      { angleDeg: '300°', radNum: '5π', radDen: '3', fn: 'cot', valKey: '-sqrt3/3', valHtml: '-' + makeFrac(makeSqrt('3'), '3') },
+
+      // 315° / 7π/4 rad
+      { angleDeg: '315°', radNum: '7π', radDen: '4', fn: 'sin', valKey: '-sqrt2/2', valHtml: '-' + makeFrac(makeSqrt('2'), '2') },
+      { angleDeg: '315°', radNum: '7π', radDen: '4', fn: 'cos', valKey: 'sqrt2/2', valHtml: makeFrac(makeSqrt('2'), '2') },
+      { angleDeg: '315°', radNum: '7π', radDen: '4', fn: 'tan', valKey: '-1', valHtml: '-1' },
+      { angleDeg: '315°', radNum: '7π', radDen: '4', fn: 'csc', valKey: '-sqrt2', valHtml: '-' + makeSqrt('2') },
+      { angleDeg: '315°', radNum: '7π', radDen: '4', fn: 'sec', valKey: 'sqrt2', valHtml: makeSqrt('2') },
+      { angleDeg: '315°', radNum: '7π', radDen: '4', fn: 'cot', valKey: '-1', valHtml: '-1' },
+
+      // 330° / 11π/6 rad
+      { angleDeg: '330°', radNum: '11π', radDen: '6', fn: 'sin', valKey: '-1/2', valHtml: '-' + makeFrac('1', '2') },
+      { angleDeg: '330°', radNum: '11π', radDen: '6', fn: 'cos', valKey: 'sqrt3/2', valHtml: makeFrac(makeSqrt('3'), '2') },
+      { angleDeg: '330°', radNum: '11π', radDen: '6', fn: 'tan', valKey: '-sqrt3/3', valHtml: '-' + makeFrac(makeSqrt('3'), '3') },
+      { angleDeg: '330°', radNum: '11π', radDen: '6', fn: 'csc', valKey: '-2', valHtml: '-2' },
+      { angleDeg: '330°', radNum: '11π', radDen: '6', fn: 'sec', valKey: '2sqrt3/3', valHtml: makeFrac('2' + makeSqrt('3'), '3') },
+      { angleDeg: '330°', radNum: '11π', radDen: '6', fn: 'cot', valKey: '-sqrt3', valHtml: '-' + makeSqrt('3') },
+
+      // 360° / 2π rad
+      { angleDeg: '360°', radNum: '2π', radDen: '', fn: 'sin', valKey: '0', valHtml: '0' },
+      { angleDeg: '360°', radNum: '2π', radDen: '', fn: 'cos', valKey: '1', valHtml: '1' },
+      { angleDeg: '360°', radNum: '2π', radDen: '', fn: 'tan', valKey: '0', valHtml: '0' },
+      { angleDeg: '360°', radNum: '2π', radDen: '', fn: 'sec', valKey: '1', valHtml: '1' }
+    ];
+
+    /* Synthesised Web Audio Sound FX */
+    class SoundController {
+      constructor() {
+        this.ctx = null;
+        this.muted = false;
+      }
+
+      init() {
+        if (!this.ctx) {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (AudioCtx) this.ctx = new AudioCtx();
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+
+      playFlip() {
+        if (this.muted) return;
+        this.init();
+        if (!this.ctx) return;
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(320, this.ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(640, this.ctx.currentTime + 0.07);
+          gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.07);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + 0.07);
+        } catch(e){}
+      }
+
+      playMatch() {
+        if (this.muted) return;
+        this.init();
+        if (!this.ctx) return;
+        try {
+          const now = this.ctx.currentTime;
+          const freqs = [523.25, 659.25, 783.99]; // C5, E5, G5
+          freqs.forEach((f, i) => {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.value = f;
+            gain.gain.setValueAtTime(0, now + i * 0.07);
+            gain.gain.linearRampToValueAtTime(0.18, now + i * 0.07 + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.07 + 0.3);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now + i * 0.07);
+            osc.stop(now + i * 0.07 + 0.3);
+          });
+        } catch(e){}
+      }
+
+      playError() {
+        if (this.muted) return;
+        this.init();
+        if (!this.ctx) return;
+        try {
+          const now = this.ctx.currentTime;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(160, now);
+          osc.frequency.setValueAtTime(120, now + 0.1);
+          gain.gain.setValueAtTime(0.12, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.25);
+        } catch(e){}
+      }
+
+      playVictory() {
+        if (this.muted) return;
+        this.init();
+        if (!this.ctx) return;
+        try {
+          const now = this.ctx.currentTime;
+          const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51];
+          notes.forEach((f, i) => {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.value = f;
+            gain.gain.setValueAtTime(0, now + i * 0.08);
+            gain.gain.linearRampToValueAtTime(0.2, now + i * 0.08 + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + 0.45);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now + i * 0.08);
+            osc.stop(now + i * 0.08 + 0.45);
+          });
+        } catch(e){}
+      }
+    }
+
+    const soundCtrl = new SoundController();
+
+    /* Game State Object */
+    const state = {
+      unit: 'degrees',        // 'degrees' or 'radians'
+      reciprocals: false,     // false: sin,cos,tan | true: all 6
+      mode: 'memory',         // 'memory' or 'faceup'
+      cards: [],
+      selectedIds: [],
+      matches: 0,
+      attempts: 0,
+      timerSeconds: 0,
+      timerInterval: null,
+      timerStarted: false,
+      isProcessing: false
+    };
+
+    /* Utility Shuffle */
+    function shuffle(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    /* Render Expression HTML */
+    function renderExprHtml(item, unit) {
+      let angleStr = (unit === 'degrees') ? item.angleDeg : makeRad(item.radNum, item.radDen);
+      
+      return `
+        <div class="flex items-center justify-center gap-1 font-serif">
+          <span class="font-semibold text-teal-300 text-lg sm:text-xl">${item.fn}</span>
+          <span class="text-slate-300 text-lg sm:text-xl">(${angleStr})</span>
+        </div>
+      `;
+    }
+
+    /* Build Reference Chart Modal Table */
+    function buildRefTable() {
+      const tbody = document.getElementById('refTableBody');
+      const angleGroups = {};
+
+      TRIG_DATA.forEach(d => {
+        if (!angleGroups[d.angleDeg]) {
+          angleGroups[d.angleDeg] = {
+            deg: d.angleDeg,
+            rad: makeRad(d.radNum, d.radDen),
+            fns: {}
+          };
+        }
+        angleGroups[d.angleDeg].fns[d.fn] = d.valHtml;
+      });
+
+      let html = '';
+      Object.values(angleGroups).forEach(g => {
+        html += `
+          <tr class="hover:bg-slate-900/80 transition-colors">
+            <td class="p-2 border-r border-slate-800 font-sans font-medium text-slate-300">${g.deg}</td>
+            <td class="p-2 border-r border-slate-800 text-slate-300">${g.rad}</td>
+            <td class="p-2 border-r border-slate-800 text-teal-300">${g.fns.sin || '—'}</td>
+            <td class="p-2 border-r border-slate-800 text-teal-300">${g.fns.cos || '—'}</td>
+            <td class="p-2 border-r border-slate-800 text-teal-300">${g.fns.tan || '—'}</td>
+            <td class="p-2 border-r border-slate-800 text-purple-300">${g.fns.csc || '—'}</td>
+            <td class="p-2 border-r border-slate-800 text-purple-300">${g.fns.sec || '—'}</td>
+            <td class="p-2 text-purple-300">${g.fns.cot || '—'}</td>
+          </tr>
+        `;
+      });
+      tbody.innerHTML = html;
+    }
+
+    /* Generate Round Cards (9 Pairs = 18 Cards total) */
+    function generateCards() {
+      // Filter DB by reciprocal setting
+      let pool = TRIG_DATA.filter(item => {
+        if (!state.reciprocals) {
+          return item.fn === 'sin' || item.fn === 'cos' || item.fn === 'tan';
+        }
+        return true;
+      });
+
+      pool = shuffle(pool);
+
+      const chosenItems = [];
+      const usedValues = new Set();
+      const usedExprs = new Set();
+
+      // Pick 9 distinct expressions
+      for (const item of pool) {
+        const exprId = `${item.fn}_${item.angleDeg}`;
+        if (!usedExprs.has(exprId)) {
+          if (!usedValues.has(item.valKey) || (chosenItems.length + (pool.length - usedValues.size) < 9)) {
+            chosenItems.push(item);
+            usedValues.add(item.valKey);
+            usedExprs.add(exprId);
+          }
+        }
+        if (chosenItems.length === 9) break;
+      }
+
+      // Fallback if pool is exhausted
+      if (chosenItems.length < 9) {
+        for (const item of pool) {
+          const exprId = `${item.fn}_${item.angleDeg}`;
+          if (!usedExprs.has(exprId)) {
+            chosenItems.push(item);
+            usedExprs.add(exprId);
+          }
+          if (chosenItems.length === 9) break;
+        }
+      }
+
+      // Construct 18 card objects
+      const cards = [];
+      chosenItems.forEach((item, idx) => {
+        const pairId = idx;
+
+        // Card 1: Expression Card
+        cards.push({
+          id: `expr_${idx}_${Math.random().toString(36).substr(2, 5)}`,
+          pairId: pairId,
+          valKey: item.valKey,
+          type: 'expression',
+          contentHtml: renderExprHtml(item, state.unit),
+          isFlipped: state.mode === 'faceup',
+          isSelected: false,
+          isMatched: false,
+          isError: false
+        });
+
+        // Card 2: Exact Value Card
+        cards.push({
+          id: `val_${idx}_${Math.random().toString(36).substr(2, 5)}`,
+          pairId: pairId,
+          valKey: item.valKey,
+          type: 'value',
+          contentHtml: `<div class="text-center font-serif text-amber-200 text-lg sm:text-xl">${item.valHtml}</div>`,
+          isFlipped: state.mode === 'faceup',
+          isSelected: false,
+          isMatched: false,
+          isError: false
+        });
+      });
+
+      return shuffle(cards);
+    }
+
+    /* Start / Reset Game Round */
+    function startNewGame() {
+      stopTimer();
+      state.timerSeconds = 0;
+      state.timerStarted = false;
+      state.matches = 0;
+      state.attempts = 0;
+      state.selectedIds = [];
+      state.isProcessing = false;
+      state.cards = generateCards();
+
+      updateStatsUI();
+      renderGrid();
+    }
+
+    /* Timer Functions */
+    function startTimer() {
+      if (state.timerStarted) return;
+      state.timerStarted = true;
+      state.timerInterval = setInterval(() => {
+        state.timerSeconds++;
+        updateStatsUI();
+      }, 1000);
+    }
+
+    function stopTimer() {
+      if (state.timerInterval) {
+        clearInterval(state.timerInterval);
+        state.timerInterval = null;
+      }
+    }
+
+    function formatTime(sec) {
+      const m = Math.floor(sec / 60).toString().padStart(2, '0');
+      const s = (sec % 60).toString().padStart(2, '0');
+      return `${m}:${s}`;
+    }
+
+    /* Update Statistics Dashboard UI */
+    function updateStatsUI() {
+      document.getElementById('statTimer').textContent = formatTime(state.timerSeconds);
+      document.getElementById('statMatches').textContent = `${state.matches} / 9`;
+      document.getElementById('statAttempts').textContent = state.attempts;
+
+      const acc = state.attempts > 0 ? Math.round((state.matches / state.attempts) * 100) : 100;
+      document.getElementById('statAccuracy').textContent = `${acc}%`;
+    }
+
+    /* Card Click Handler */
+    function handleCardClick(cardId) {
+      if (state.isProcessing) return;
+
+      const card = state.cards.find(c => c.id === cardId);
+      if (!card || card.isMatched) return;
+
+      if (!state.timerStarted) {
+        startTimer();
+      }
+
+      // Handle Face-Up Mode
+      if (state.mode === 'faceup') {
+        if (card.isSelected) {
+          card.isSelected = false;
+          state.selectedIds = [];
+          renderGrid();
+          return;
+        }
+
+        soundCtrl.playFlip();
+        card.isSelected = true;
+        state.selectedIds.push(card.id);
+        renderGrid();
+
+        if (state.selectedIds.length === 2) {
+          checkPairMatch();
+        }
+      } 
+      // Handle Memory Mode
+      else {
+        if (card.isFlipped) return;
+
+        soundCtrl.playFlip();
+        card.isFlipped = true;
+        card.isSelected = true;
+        state.selectedIds.push(card.id);
+        renderGrid();
+
+        if (state.selectedIds.length === 2) {
+          checkPairMatch();
+        }
+      }
+    }
+
+    /* Check Match Logic */
+    function checkPairMatch() {
+      state.isProcessing = true;
+      state.attempts++;
+
+      const [c1, c2] = state.selectedIds.map(id => state.cards.find(c => c.id === id));
+
+      const isMatch = (c1.valKey === c2.valKey);
+
+      if (isMatch) {
+        soundCtrl.playMatch();
+        c1.isMatched = true;
+        c2.isMatched = true;
+        c1.isSelected = false;
+        c2.isSelected = false;
+
+        state.matches++;
+        state.selectedIds = [];
+        state.isProcessing = false;
+
+        updateStatsUI();
+        renderGrid();
+
+        if (state.matches === 9) {
+          onVictory();
+        }
+      } else {
+        soundCtrl.playError();
+        c1.isError = true;
+        c2.isError = true;
+        renderGrid();
+
+        setTimeout(() => {
+          c1.isError = false;
+          c2.isError = false;
+          c1.isSelected = false;
+          c2.isSelected = false;
+
+          if (state.mode === 'memory') {
+            c1.isFlipped = false;
+            c2.isFlipped = false;
+          }
+
+          state.selectedIds = [];
+          state.isProcessing = false;
+          updateStatsUI();
+          renderGrid();
+        }, state.mode === 'memory' ? 850 : 650);
+      }
+    }
+
+    /* Trigger Victory Celebration */
+    function onVictory() {
+      stopTimer();
+      soundCtrl.playVictory();
+
+      const acc = Math.round((state.matches / state.attempts) * 100);
+      document.getElementById('finalTime').textContent = formatTime(state.timerSeconds);
+      document.getElementById('finalAttempts').textContent = state.attempts;
+      document.getElementById('finalAccuracy').textContent = `${acc}%`;
+
+      let stars = '⭐⭐⭐';
+      let feedback = 'Ka pai! Outstanding performance with exact trig values!';
+      if (acc < 70 || state.timerSeconds > 150) {
+        stars = '⭐';
+        feedback = 'Good completion! Practise regularly to increase your speed and accuracy.';
+      } else if (acc < 85 || state.timerSeconds > 90) {
+        stars = '⭐⭐';
+        feedback = 'Great job! You possess sharp trigonometric skills!';
+      }
+
+      document.getElementById('starContainer').innerHTML = stars;
+      document.getElementById('victoryFeedback').textContent = feedback;
+
+      setTimeout(() => {
+        openModal('victoryModal');
+      }, 400);
+    }
+
+    /* Render Cards Grid HTML */
+    function renderGrid() {
+      const container = document.getElementById('cardGrid');
+      let html = '';
+
+      state.cards.forEach(card => {
+        let borderClass = 'border-slate-800 hover:border-slate-700';
+
+        if (card.isMatched) {
+          borderClass = 'border-emerald-500/80 bg-emerald-950/20 shadow-[0_0_15px_rgba(16,185,129,0.25)]';
+        } else if (card.isError) {
+          borderClass = 'border-rose-500 ring-2 ring-rose-500/60 shadow-[0_0_15px_rgba(244,63,94,0.3)] animate-shake';
+        } else if (card.isSelected) {
+          borderClass = 'border-teal-400 ring-2 ring-teal-400/80 shadow-[0_0_18px_rgba(45,212,191,0.35)]';
+        } else {
+          borderClass = card.type === 'expression' 
+            ? 'border-teal-900/50 hover:border-teal-500/50' 
+            : 'border-purple-900/50 hover:border-purple-500/50';
+        }
+
+        if (state.mode === 'memory') {
+          // 3D Flippable Memory Card
+          html += `
+            <div onclick="handleCardClick('${card.id}')" class="perspective-1000 w-full aspect-[4/3.2] sm:aspect-[3/4] cursor-pointer">
+              <div class="relative w-full h-full transition-transform duration-500 transform-style-3d ${card.isFlipped || card.isMatched ? 'rotate-y-180' : ''}">
+                
+                <!-- CARD BACK (Face Down) -->
+                <div class="absolute inset-0 backface-hidden rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-850 to-emerald-950/60 flex flex-col items-center justify-center p-2 shadow-lg hover:border-teal-500/50 hover:shadow-teal-500/10 transition-all group">
+                  <div class="w-10 h-10 rounded-xl border border-emerald-500/30 bg-emerald-950/40 flex items-center justify-center text-emerald-400 font-serif font-bold text-lg group-hover:scale-110 transition-transform shadow-inner">
+                    θ
+                  </div>
+                  <span class="text-[9px] tracking-widest text-slate-500 mt-2 font-mono uppercase">TrigMatch</span>
+                </div>
+
+                <!-- CARD FRONT (Face Up) -->
+                <div class="absolute inset-0 backface-hidden rotate-y-180 rounded-2xl border ${borderClass} bg-slate-900/95 backdrop-blur-md flex flex-col items-center justify-between p-2.5 sm:p-3 shadow-xl">
+                  <div class="w-full flex justify-between items-center text-[9px] font-mono">
+                    <span class="${card.type === 'expression' ? 'text-teal-400 bg-teal-950/80 border-teal-800/60' : 'text-purple-400 bg-purple-950/80 border-purple-800/60'} px-2 py-0.5 rounded-full border uppercase tracking-wider font-semibold">
+                      ${card.type}
+                    </span>
+                    ${card.isMatched ? '<span class="text-emerald-400 font-bold">✓</span>' : ''}
+                  </div>
+                  <div class="my-auto flex items-center justify-center w-full">
+                    ${card.contentHtml}
+                  </div>
+                  <div class="w-full text-center text-[8px] sm:text-[9px] text-slate-500 font-mono">
+                    ${card.type === 'expression' ? 'Trig Function' : 'Exact Value'}
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          `;
+        } else {
+          // Flat Selection Card (Face-Up Mode)
+          html += `
+            <div onclick="handleCardClick('${card.id}')" class="w-full aspect-[4/3.2] sm:aspect-[3/4] rounded-2xl border ${borderClass} ${card.isMatched ? 'opacity-40 pointer-events-none' : 'bg-slate-900/90 hover:bg-slate-850 cursor-pointer shadow-lg'} backdrop-blur-md flex flex-col items-center justify-between p-2.5 sm:p-3 transition-all">
+              <div class="w-full flex justify-between items-center text-[9px] font-mono">
+                <span class="${card.type === 'expression' ? 'text-teal-400 bg-teal-950/80 border-teal-800/60' : 'text-purple-400 bg-purple-950/80 border-purple-800/60'} px-2 py-0.5 rounded-full border uppercase tracking-wider font-semibold">
+                  ${card.type}
+                </span>
+                ${card.isMatched ? '<span class="text-emerald-400 font-bold">✓</span>' : ''}
+              </div>
+              <div class="my-auto flex items-center justify-center w-full">
+                ${card.contentHtml}
+              </div>
+              <div class="w-full text-center text-[8px] sm:text-[9px] text-slate-500 font-mono">
+                ${card.type === 'expression' ? 'Trig Function' : 'Exact Value'}
+              </div>
+            </div>
+          `;
+        }
+      });
+
+      container.innerHTML = html;
+    }
+
+    /* Option Handlers */
+    function setAngleUnit(unit) {
+      state.unit = unit;
+      updateControlPills();
+      startNewGame();
+    }
+
+    function toggleReciprocals() {
+      state.reciprocals = !state.reciprocals;
+      updateReciprocalUI();
+      startNewGame();
+    }
+
+    function setGameMode(mode) {
+      state.mode = mode;
+      updateControlPills();
+      startNewGame();
+    }
+
+    function toggleSound() {
+      soundCtrl.muted = !soundCtrl.muted;
+      document.getElementById('soundIcon').textContent = soundCtrl.muted ? '🔇' : '🔊';
+    }
+
+    /* Control Pills UI Updates */
+    function updateControlPills() {
+      // Angle units
+      ['deg', 'rad'].forEach(u => {
+        const btn = document.getElementById(`unit-${u}`);
+        btn.className = "flex-1 py-1.5 text-xs font-medium rounded-lg transition-all " +
+          ((u === 'deg' && state.unit === 'degrees') || (u === 'rad' && state.unit === 'radians')
+            ? "bg-teal-500 text-slate-950 font-bold shadow-md"
+            : "text-slate-400 hover:text-slate-200");
+      });
+
+      // Modes
+      ['mem', 'face'].forEach(m => {
+        const btn = document.getElementById(`mode-${m}`);
+        btn.className = "flex-1 py-1.5 text-xs font-medium rounded-lg transition-all flex items-center justify-center gap-1 " +
+          ((m === 'mem' && state.mode === 'memory') || (m === 'face' && state.mode === 'faceup')
+            ? "bg-emerald-600 text-white font-bold shadow-md"
+            : "text-slate-400 hover:text-slate-200");
+      });
+    }
+
+    function updateReciprocalUI() {
+      const recipLabel = document.getElementById('recipLabel');
+      const recipSwitch = document.getElementById('recipSwitch');
+      const recipDot = document.getElementById('recipDot');
+
+      if (state.reciprocals) {
+        recipLabel.textContent = "All 6 (incl. csc, sec, cot)";
+        recipLabel.className = "text-purple-400 font-semibold";
+        recipSwitch.className = "w-8 h-4 bg-purple-600 rounded-full relative transition-colors";
+        recipDot.className = "w-3 h-3 bg-white rounded-full absolute top-0.5 left-4 transition-transform";
+      } else {
+        recipLabel.textContent = "Primary (sin, cos, tan)";
+        recipLabel.className = "text-slate-300";
+        recipSwitch.className = "w-8 h-4 bg-slate-800 rounded-full relative transition-colors";
+        recipDot.className = "w-3 h-3 bg-slate-400 rounded-full absolute top-0.5 left-0.5 transition-transform";
+      }
+    }
+
+    /* Modal Display Handlers */
+    function openModal(id) {
+      document.getElementById(id).classList.remove('hidden');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.add('hidden');
+    }
+
+    /* Initialise on Load */
+    window.onload = function() {
+      buildRefTable();
+      updateControlPills();
+      updateReciprocalUI();
+      startNewGame();
+    };
+  </script>
+</body>
+</html>
